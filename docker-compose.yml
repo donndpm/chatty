@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  postgres:
+    container_name: chatty_db
+    image: postgres
+    restart: always
+    env_file:
+      - './db/database.env'
+    volumes:
+      - 'database-data:/var/lib/postgresql/data'
+    ports:
+      - '5432:5432'
+
+volumes:
+  database-data:
