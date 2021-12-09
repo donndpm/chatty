@@ -5,7 +5,25 @@ const app = express()
 const db = require('./models')
 const AuthRoute = require('./routes/auth.route')
 
+//db.sequelize.sync({force:true}).then(()=> initial())
 db.sequelize.sync()
+
+function initial() {
+    db.role.create({
+        id: 1,
+        name: 'user'
+    })
+
+    db.role.create({
+        id: 2,
+        name: 'admin'
+    })
+
+    db.role.create({
+        id: 3,
+        name: 'moderator'
+    })
+}
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())

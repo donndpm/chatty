@@ -1,7 +1,19 @@
 const db = require('../models')
 
 const verifySignUp = (req, res, next) => {
-    
+
+    const roles = req.body.roles
+    console.log(roles)
+
+        var roleAddedCnt = 0
+            
+        roles.map(role => {
+            console.log(role)
+            ++roleAddedCnt
+        })
+
+        console.log(roleAddedCnt)
+
     //check if username already exists
     db.user.findOne({
         where: {

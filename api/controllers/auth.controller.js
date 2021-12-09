@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt')
 const authConfig = require('../config/auth.config')
 const jwt = require('jsonwebtoken')
 
+const Op = require('sequelize').Op
+
 const SignUp = (req, res) => {
 
     const hashPassword = bcrypt.hashSync(req.body.password, 8)
@@ -11,10 +13,30 @@ const SignUp = (req, res) => {
         username: req.body.username,
         email: req.body.email,
         password: hashPassword
-    }).then(() => {
-        return res.status(201).send({
-            message: 'Registration successful!'
-        })
+    }).then(user => {
+        if(req.body.roles) {
+            db.role.findAll({
+                where: {
+                    name: {
+                        [Op.or]: req.body.roles
+                    }
+                }
+            }).then(roles => {
+                if(roles) {
+                    user.setRoles(roles).then(() => {
+                        return res.status(201).send({
+                            message: 'Registration successful!'
+                        })
+                    })
+                }
+            })
+        } else {
+            user.setRoles([1]).then(() => {
+                return res.status(201).send({
+                    message: 'Registration successful!'
+                })
+            })
+        } 
     }).catch(err => {
         return res.status(500).send({
             message: err.message
@@ -33,22 +55,22 @@ const SignIn = (req, res) => {
     }
 
     jwt.sign({ payload: req.body.username }, 
-            authConfig.SECRET,
-            {
-                expiresIn: '1h'
-            }, (err, token) => {
-                if(err) {
-                    return res.status(500).send({
-                        message: 'Something went wrong while generating token!'
-                    })
-                }
-
-                return res.status(200).send({
-                    username: res.locals.user.username,
-                    email: res.locals.user.email,
-                    token: token
+        authConfig.SECRET,
+        {
+            expiresIn: '1h'
+        }, (err, token) => {
+            if(err) {
+                return res.status(500).send({
+                    message: 'Something went wrong while generating token!'
                 })
+            }
+
+            return res.status(200).send({
+                username: res.locals.user.username,
+                email: res.locals.user.email,
+                token: token
             })
+        })
 }
 
 const AuthController = {
