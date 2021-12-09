@@ -1,13 +1,11 @@
 const db = require('../models')
 
 const verifySignUp = (req, res, next) => {
-    const username = req.body.username
-    const email = req.body.email
-
+    
     //check if username already exists
     db.user.findOne({
         where: {
-            username: username
+            username: req.body.username
         }
     }).then(user => {
         if(user) {
@@ -19,7 +17,7 @@ const verifySignUp = (req, res, next) => {
         //check if email already exists
         db.user.findOne({
             where: {
-                email: email
+                email: req.body.email
             }
         }).then(email => {
             if(email) {
@@ -28,7 +26,6 @@ const verifySignUp = (req, res, next) => {
                 })
             }
 
-            //next() - verify signup pass
             next()
         })
     })
@@ -46,6 +43,7 @@ const verifySignIn = (req, res, next) => {
             })
         }
 
+        res.locals.user = user
         next()
     })
 }
