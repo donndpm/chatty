@@ -76,6 +76,7 @@ const SignIn = (req, res) => {
       return res.status(200).send({
         username: res.locals.user.username,
         email: res.locals.user.email,
+        roles: res.locals.roles,
         token: token,
       });
     }

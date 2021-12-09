@@ -48,8 +48,16 @@ const verifySignIn = (req, res, next) => {
         });
       }
 
-      res.locals.user = user;
-      next();
+      let userRoles = new Array();
+      user.getRoles().then((roles) => {
+        for (let i = 0; i < roles.length; i++) {
+          userRoles.push(roles[i].name);
+        }
+
+        res.locals.user = user;
+        res.locals.roles = userRoles;
+        next();
+      });
     });
 };
 
