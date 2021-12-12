@@ -3,7 +3,8 @@ const bodyParser = require("body-parser");
 const PORT = 3001;
 const app = express();
 const db = require("./models");
-const AuthRoute = require("./routes/auth.route");
+const checkRole = require("./middlewares/role.middleware");
+const checkToken = require("./middlewares/auth.middleware");
 
 //db.sequelize.sync({force:true}).then(()=> initial())
 db.sequelize.sync();
@@ -31,9 +32,9 @@ app.use(bodyParser.json());
 //user auth routes
 require("./routes/auth.route")(app);
 
-app.get("/api", (req, res) => {
+app.get("/api", [checkToken.verifyToken, checkRole.isAdmin], (req, res) => {
   return res.status(200).send({
-    message: "Its working!" + req.body.user,
+    message: "Its working!",
   });
 });
 

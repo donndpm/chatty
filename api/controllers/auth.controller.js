@@ -61,7 +61,9 @@ const SignIn = (req, res) => {
   }
 
   jwt.sign(
-    { payload: req.body.username },
+    {
+      userID: res.locals.user.id,
+    },
     authConfig.SECRET,
     {
       expiresIn: "1h",

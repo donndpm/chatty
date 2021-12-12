@@ -1,4 +1,6 @@
 const db = require("../models");
+const jwt = require("jsonwebtoken");
+const authConfig = require("../config/auth.config");
 
 const verifySignUp = (req, res, next) => {
   //check if username already exists
@@ -61,9 +63,31 @@ const verifySignIn = (req, res, next) => {
     });
 };
 
+const verifyToken = (req, res, next) => {
+  const token = req.headers["x-access-token"];
+
+  if (!token) {
+    return res.status(401).send({
+      message: "No token provided!",
+    });
+  }
+
+  jwt.verify(token, authConfig.SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).send({
+        message: "Unauthorized!",
+      });
+    }
+    console.log(decoded);
+    res.locals.userID = decoded.userID;
+    next();
+  });
+};
+
 const AuthMiddleware = {
   verifySignIn,
   verifySignUp,
+  verifyToken,
 };
 
 module.exports = AuthMiddleware;
